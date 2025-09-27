@@ -14,10 +14,12 @@ app.use(express.json());
 // Import routes
 const authRoutes = require("./src/routes/authRoutes");
 const participantRoutes= require("./src/routes/participantRoutes")
+const emailRoutes = require("./src/routes/emailRoutes");
 
 // Use routes
 app.use("/api/auth", authRoutes);
 app.use("/participants",participantRoutes)
+app.use("/emails", emailRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;
