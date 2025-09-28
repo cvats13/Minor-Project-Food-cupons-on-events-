@@ -1,52 +1,109 @@
 const db = require("../config/db");
 const bcrypt = require("bcryptjs");
 
-exports.signup = async (req, res) => {
+// Signup Controller
+const signup = async (req, res) => {
   try {
-    const { name, emailid, username, password } = req.body;
+    const { name, username, email, password } = req.body;
 
-    // 🔹 Validations
-    if (!name || !emailid || !username || !password) {
-      return res.status(400).json({ error: "All fields are required" });
+    // 1. Check empty fields
+    if (!name || !username || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
     }
 
-    if (password.length < 6) {
-      return res.status(400).json({ error: "Password must be at least 6 characters long" });
+    // 2. Validate name length
+    if (name.length > 20) {
+      return res.status(400).json({ message: "Name must not exceed 20 characters" });
     }
 
-    // 🔹 Check if username/email already exists
-    db.query(
-      "SELECT * FROM users WHERE emailid = ? OR username = ?",
-      [emailid, username],
-      async (err, results) => {
-        if (err) {
-          console.error("❌ DB error:", err.message);
-          return res.status(500).json({ error: "Database error" });
-        }
+    // 3. Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
 
-        if (results.length > 0) {
-          return res.status(400).json({ error: "Email or Username already exists" });
-        }
-
-        // 🔹 Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // 🔹 Insert new user
-        db.query(
-          "INSERT INTO users (name, emailid, username, password) VALUES (?, ?, ?, ?)",
-          [name, emailid, username, hashedPassword],
-          (err, result) => {
-            if (err) {
-              console.error("❌ Insert error:", err.message);
-              return res.status(500).json({ error: "Error creating user" });
-            }
-            res.status(201).json({ message: "✅ User registered successfully" });
-          }
-        );
+    // 4. Check if username already exists
+    const checkUserQuery = "SELECT * FROM users WHERE username = ?";
+    db.query(checkUserQuery, [username], async (err, results) => {
+      if (err) {
+        console.error("Error checking username:", err);
+        return res.status(500).json({ message: "Database error" });
       }
-    );
+
+      if (results.length > 0) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+
+      // 5. Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // 6. Insert new user
+      const insertQuery =
+        "INSERT INTO users (name, username, email, password) VALUES (?, ?, ?, ?)";
+
+      db.query(insertQuery, [name, username, email, hashedPassword], (err, result) => {
+        if (err) {
+          console.error("Error inserting user:", err);
+          return res.status(500).json({ message: "Database error" });
+        }
+
+        res.status(201).json({
+          message: "User registered successfully 🚀",
+          userId: result.insertId,
+          name,
+          username,
+          email,
+        });
+      });
+    });
   } catch (error) {
-    console.error("❌ Error:", error.message);
-    res.status(500).json({ error: "Server error" });
+    console.error("Signup Error:", error.message);
+    res.status(500).json({ message: "Server error" });
   }
 };
+
+const signin = async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ message: "Username and password are required" });
+    }
+
+    // Check if user exists
+    db.query("SELECT * FROM users WHERE username = ?", [username], async (err, results) => {
+      try {
+        if (err) {
+          console.error("❌ Database error during signin:", err);
+          return res.status(500).json({ message: "Database error" });
+        }
+
+        if (results.length === 0) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        const user = results[0];
+
+        // Compare password
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+          return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        res.status(200).json({
+          message: "Signin successful 🎉"
+        });
+      } catch (error) {
+        console.error("❌ Error during signin process:", error);
+        res.status(500).json({ message: "Something went wrong while signing in" });
+      }
+    });
+  } catch (error) {
+    console.error("❌ Unexpected error in signin:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+
+module.exports = { signup,signin };
