@@ -1,7 +1,15 @@
-export default function App() {
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Signup from "./Components/Auth/signup";
+
+function App() {
   return (
-    <h1 className="text-4xl font-bold text-blue-600 underline">
-      Tailwind is working 🚀
-    </h1>
-  )
+    <Router>
+      <Routes>
+        <Route path="/signup" element={<Signup />} />
+      </Routes>
+    </Router>
+  );
 }
+
+export default App;
+
