@@ -1,0 +1,24 @@
+{
+  "name": "minor-project-food-cupons-on-events-",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"npm run dev --prefix Backend\" \"npm run dev --prefix Client/Food-Cupon\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HardikDhawan9311/Minor-Project-Food-cupons-on-events-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HardikDhawan9311/Minor-Project-Food-cupons-on-events-/issues"
+  },
+  "homepage": "https://github.com/HardikDhawan9311/Minor-Project-Food-cupons-on-events-#readme"
+}
