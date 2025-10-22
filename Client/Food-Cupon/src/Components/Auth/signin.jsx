@@ -86,7 +86,7 @@ const SignIn = () => {
         <p className="mt-5 text-center text-xs text-gray-700">
           Don’t have an account?{" "}
           <a
-            href="/signup"
+            href="/"
             className="text-indigo-600 font-semibold hover:underline"
           >
             Sign Up
