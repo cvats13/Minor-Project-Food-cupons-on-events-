@@ -17,7 +17,7 @@ const participantRoutes= require("./src/routes/participantRoutes")
 const emailRoutes = require("./src/routes/emailRoutes");
 
 // Use routes
-app.use("/api/auth", authRoutes);
+app.use("/auth", authRoutes);
 app.use("/participants",participantRoutes)
 app.use("/emails", emailRoutes);
 

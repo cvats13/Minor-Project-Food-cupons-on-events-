@@ -3,13 +3,19 @@ import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
+    name: "",
     username: "",
     email: "",
     password: "",
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    // Limit name input to 20 characters
+    if (name === "name" && value.length > 20) return;
+
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = (e) => {
@@ -29,6 +35,21 @@ const SignUp = () => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Name */}
+          <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-white/60">
+            <FaUser className="text-gray-500 mr-2" />
+            <input
+              type="text"
+              name="name"
+              placeholder="Full Name"
+              maxLength="20"
+              value={formData.name}
+              onChange={handleChange}
+              className="w-full bg-transparent focus:outline-none text-sm"
+              required
+            />
+          </div>
+
           {/* Username */}
           <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-white/60">
             <FaUser className="text-gray-500 mr-2" />
@@ -36,8 +57,10 @@ const SignUp = () => {
               type="text"
               name="username"
               placeholder="Username"
+              value={formData.username}
               onChange={handleChange}
               className="w-full bg-transparent focus:outline-none text-sm"
+              required
             />
           </div>
 
@@ -48,8 +71,10 @@ const SignUp = () => {
               type="email"
               name="email"
               placeholder="Email"
+              value={formData.email}
               onChange={handleChange}
               className="w-full bg-transparent focus:outline-none text-sm"
+              required
             />
           </div>
 
@@ -60,8 +85,10 @@ const SignUp = () => {
               type="password"
               name="password"
               placeholder="Password"
+              value={formData.password}
               onChange={handleChange}
               className="w-full bg-transparent focus:outline-none text-sm"
+              required
             />
           </div>
 
