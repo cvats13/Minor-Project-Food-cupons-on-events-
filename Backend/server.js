@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const db = require("./src/config/db");
+const cors=require("cors");
 
 const app = express();
 
@@ -10,6 +11,7 @@ dotenv.config();
 
 // Middleware
 app.use(express.json());
+app.use(cors());
 
 // Import routes
 const authRoutes = require("./src/routes/authRoutes");
@@ -17,7 +19,7 @@ const participantRoutes= require("./src/routes/participantRoutes")
 const emailRoutes = require("./src/routes/emailRoutes");
 
 // Use routes
-app.use("/api/auth", authRoutes);
+app.use("/auth", authRoutes);
 app.use("/participants",participantRoutes)
 app.use("/emails", emailRoutes);
 

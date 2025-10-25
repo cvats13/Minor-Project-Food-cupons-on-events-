@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+
 
 const SignIn = () => {
   // Step 1: State for form data
@@ -8,16 +10,41 @@ const SignIn = () => {
     password: "",
   });
 
+  const navigate = useNavigate();
+
+
   // Step 2: Update input values
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   // Step 3: Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert("Login logic goes here!");
-  };
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await fetch("http://localhost:5000/auth/signin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Invalid credentials");
+    }
+
+    alert("Login successful! 🎉");
+    localStorage.setItem("user", JSON.stringify(data.user));
+    navigate("/home"); // ✅ redirect to home
+  } catch (err) {
+    alert(`Login failed: ${err.message}`);
+  }
+};
+
 
   // Step 4: Handle Google login
   const handleGoogleLogin = () => {

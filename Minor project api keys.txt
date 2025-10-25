@@ -1,0 +1,21 @@
+Details for all API keys for food cupons 
+
+1.Signup ------>   localhost:5000/auth/signup ------> post request
+	Json  for this 
+{
+  "name": "John Doe",
+  "username": "john_doe01",
+  "email": "john.doe@gmail.com",
+  "password": "password123"
+}
+
+2. Sigin ------ > localhost:5000/auth/signin -------> Post request
+	json for this 
+{
+  "username": "john_doe01",
+  "password": "password123"
+}
+
+3. 
+
+

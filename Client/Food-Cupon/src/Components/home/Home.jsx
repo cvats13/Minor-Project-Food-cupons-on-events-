@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
-export default function App() {
+
+export default function Home() {
   const [showScanner, setShowScanner] = useState(false);
 
   return (
