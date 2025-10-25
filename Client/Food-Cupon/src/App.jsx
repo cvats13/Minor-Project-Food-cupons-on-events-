@@ -4,17 +4,13 @@ import SignIn from "./Components/Auth/signin";
 import Home from "./Components/home/Home";
 
 
-
-
-
-
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Signup />} />
         <Route path="/signin" element={<SignIn />} />
-        <Route path="/Home" element={<Home/>} />
+        <Route path="/home" element={<Home/>} />
          
       </Routes>
     </Router>

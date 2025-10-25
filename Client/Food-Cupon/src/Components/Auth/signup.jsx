@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -8,6 +10,11 @@ const SignUp = () => {
     email: "",
     password: "",
   });
+
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const navigate = useNavigate();
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,9 +25,34 @@ const SignUp = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+   const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Signup logic goes here!");
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const response = await fetch("http://localhost:5000/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Something went wrong");
+      }
+
+      setSuccess(data.message);
+      alert("Signup successful! 🎉");
+      navigate("/home"); // this will take the user to Home page
+      // window.location.href = "/signin";
+    } catch (err) {
+      setError(err.message);
+      alert(`Error: ${err.message}`);
+    }
   };
 
   const handleGoogleSignup = () => {
