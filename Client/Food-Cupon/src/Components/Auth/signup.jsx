@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { saveToken } from "../../utils/auth";
 
 
 const SignUp = () => {
@@ -26,34 +27,39 @@ const SignUp = () => {
   };
 
    const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(null);
+  e.preventDefault();
+  setError(null);
+  setSuccess(null);
 
-    try {
-      const response = await fetch("http://localhost:5000/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+  try {
+    const response = await fetch("http://localhost:5000/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.message || "Something went wrong");
-      }
-
-      setSuccess(data.message);
-      alert("Signup successful! 🎉");
-      navigate("/home"); // this will take the user to Home page
-      // window.location.href = "/signin";
-    } catch (err) {
-      setError(err.message);
-      alert(`Error: ${err.message}`);
+    if (!response.ok) {
+      throw new Error(data.message || "Something went wrong");
     }
-  };
+
+    // ✅ Save the token from backend
+    if (data.token) {
+      saveToken(data.token);
+    }
+
+    setSuccess(data.message);
+    alert("Signup successful! 🎉");
+    navigate("/home");
+  } catch (err) {
+    setError(err.message);
+    alert(`Error: ${err.message}`);
+  }
+};
+
 
   const handleGoogleSignup = () => {
     alert("Google signup logic goes here!");

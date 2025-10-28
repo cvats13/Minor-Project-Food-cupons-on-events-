@@ -1,7 +1,18 @@
 const db = require("../config/db");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+require("dotenv").config(); // Make sure you have JWT_SECRET in .env
 
-// Signup Controller
+// Utility function to create JWT token
+const createToken = (user) => {
+  return jwt.sign(
+    { id: user.id, username: user.username, email: user.email },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" } // expires in 1 day
+  );
+};
+
+// ---------------- SIGNUP ----------------
 const signup = async (req, res) => {
   try {
     const { name, username, email, password } = req.body;
@@ -47,12 +58,19 @@ const signup = async (req, res) => {
           return res.status(500).json({ message: "Database error" });
         }
 
-        res.status(201).json({
-          message: "User registered successfully 🚀",
-          userId: result.insertId,
+        // 7. Create JWT token
+        const newUser = {
+          id: result.insertId,
           name,
           username,
           email,
+        };
+        const token = createToken(newUser);
+
+        res.status(201).json({
+          message: "User registered successfully 🚀",
+          user: newUser,
+          token,
         });
       });
     });
@@ -62,6 +80,7 @@ const signup = async (req, res) => {
   }
 };
 
+// ---------------- SIGNIN ----------------
 const signin = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -90,8 +109,18 @@ const signin = async (req, res) => {
           return res.status(401).json({ message: "Invalid credentials" });
         }
 
+        // ✅ Create JWT token
+        const token = createToken(user);
+
         res.status(200).json({
-          message: "Signin successful 🎉"
+          message: "Signin successful 🎉",
+          user: {
+            id: user.id,
+            name: user.name,
+            username: user.username,
+            email: user.email,
+          },
+          token,
         });
       } catch (error) {
         console.error("❌ Error during signin process:", error);
@@ -104,6 +133,4 @@ const signin = async (req, res) => {
   }
 };
 
-
-
-module.exports = { signup,signin };
+module.exports = { signup, signin };
