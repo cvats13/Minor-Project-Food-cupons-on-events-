@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { FaUser, FaLock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { saveToken } from "../../utils/auth";
+
 
 
 const SignIn = () => {
@@ -37,13 +39,20 @@ const SignIn = () => {
       throw new Error(data.message || "Invalid credentials");
     }
 
+    // ✅ Save JWT token
+    if (data.token) {
+      saveToken(data.token);
+    }
+
+
+
     alert("Login successful! 🎉");
-    localStorage.setItem("user", JSON.stringify(data.user));
-    navigate("/home"); // ✅ redirect to home
+    navigate("/home");
   } catch (err) {
     alert(`Login failed: ${err.message}`);
   }
 };
+
 
 
   // Step 4: Handle Google login
