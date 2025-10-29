@@ -9,9 +9,10 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Signup />} />
-        <Route path="/signin" element={<SignIn />} />
+        <Route path="/Home" element={<Home />} />
 
-        {/* ✅ Protected Home Route */}
+
+        ✅ Protected Home Route
         <Route
           path="/home"
           element={
