@@ -2,7 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Signup from "./Components/Auth/signup";
 import SignIn from "./Components/Auth/signin";
 import Home from "./Components/home/Home";
-import ProtectedRoute from "./Components/ProtectedRoute"; // ✅ new import
+import Setting from "./Components/Settings/SettingPage";
+import ProtectedRoute from "./Components/ProtectedRoute";
 
 function App() {
   return (
@@ -17,6 +18,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Setting/>
             </ProtectedRoute>
           }
         />
