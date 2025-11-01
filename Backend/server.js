@@ -22,6 +22,7 @@ const emailRoutes = require("./src/routes/emailRoutes");
 app.use("/auth", authRoutes);
 app.use("/participants",participantRoutes)
 app.use("/emails", emailRoutes);
+app.use("/generation",emailRoutes)
 
 // Start server
 const PORT = process.env.PORT || 5000;

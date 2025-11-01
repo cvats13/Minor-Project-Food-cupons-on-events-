@@ -2,7 +2,7 @@ const xlsx = require("xlsx");
 const db = require("../config/db");
 const path = require("path");
 const fs = require("fs");
-
+const axios = require("axios");
 
 // 🔹 Generate random 12-char token
 function generateTokenId(teamName, name, email) {
@@ -24,30 +24,21 @@ function generateTokenId(teamName, name, email) {
   return (part1 + part2 + part3 + random).substring(0, 12);
 }
 
-// 🔹 Ensure unique token_id (retry if duplicate exists)
-async function getUniqueToken(db, teamName, name, email) {
+// 🔹 Ensure unique token_id
+async function getUniqueToken(teamName, name, email) {
   let token;
   let isUnique = false;
 
   while (!isUnique) {
     token = generateTokenId(teamName, name, email);
-
-    const [rows] = await new Promise((resolve, reject) => {
-      db.query("SELECT id FROM participants WHERE token_id = ?", [token], (err, result) => {
-        if (err) reject(err);
-        else resolve([result]);
-      });
-    });
-
-    if (rows.length === 0) {
-      isUnique = true;
-    }
+    const [rows] = await db.execute("SELECT id FROM participants WHERE token_id = ?", [token]);
+    if (rows.length === 0) isUnique = true;
   }
 
   return token;
 }
 
-// Upload Excel & insert into DB (with duplicate prevention + token_id)
+// 🔹 Upload Excel, insert data, generate tokens
 const uploadExcel = async (req, res) => {
   try {
     if (!req.file) {
@@ -71,15 +62,12 @@ const uploadExcel = async (req, res) => {
       return res.status(400).json({ error: "Excel sheet has no rows" });
     }
 
-    const normalize = (key) =>
-      key.toString().trim().toLowerCase().replace(/\s+/g, "");
+    const normalize = (key) => key.toString().trim().toLowerCase().replace(/\s+/g, "");
 
     const requiredHeaders = ["teamname", "name", "email", "checkin"];
     const fileHeaders = Object.keys(sheetData[0]).map(normalize);
 
-    const missingHeaders = requiredHeaders.filter(
-      (h) => !fileHeaders.includes(h)
-    );
+    const missingHeaders = requiredHeaders.filter((h) => !fileHeaders.includes(h));
 
     if (missingHeaders.length > 0) {
       return res.status(400).json({
@@ -89,6 +77,7 @@ const uploadExcel = async (req, res) => {
       });
     }
 
+    // Normalize all rows
     sheetData = sheetData.map((row) => {
       const normalizedRow = {};
       for (const key in row) {
@@ -100,59 +89,63 @@ const uploadExcel = async (req, res) => {
     let insertCount = 0;
     let errorCount = 0;
 
+    // 🔹 Insert rows one by one
     for (let [index, row] of sheetData.entries()) {
       const { teamname, name, email, checkin } = row;
 
       if (!teamname || !name || !email || !checkin) {
-        errorCount++;
         console.warn(`⚠️ Missing fields in row ${index + 2}, skipping...`);
+        errorCount++;
         continue;
       }
 
       try {
-        // 🔹 Generate unique token for new participant
-        const token_id = await getUniqueToken(db, teamname, name, email);
+        const token_id = await getUniqueToken(teamname, name, email);
+        const [result] = await db.execute(
+          "INSERT IGNORE INTO participants (team_name, name, email, check_in, token_id) VALUES (?, ?, ?, ?, ?)",
+          [teamname, name, email, checkin, token_id]
+        );
 
-        await new Promise((resolve, reject) => {
-          db.query(
-            "INSERT IGNORE INTO participants (team_name, name, email, check_in, token_id) VALUES (?, ?, ?, ?, ?)",
-            [teamname, name, email, checkin, token_id],
-            (err, result) => {
-              if (err) {
-                console.error(`❌ DB Error in row ${index + 2}:`, err.message);
-                errorCount++;
-                reject(err);
-              } else {
-                if (result.affectedRows > 0) {
-                  insertCount++;
-                } else {
-                  console.log(`⚠️ Duplicate skipped for ${teamname} - ${email}`);
-                }
-                resolve();
-              }
-            }
-          );
-        });
+        if (result.affectedRows > 0) {
+          insertCount++;
+        } else {
+          console.log(`⚠️ Duplicate skipped for ${teamname} - ${email}`);
+        }
       } catch (err) {
-        console.error(`❌ Error inserting row ${index + 2}:`, err.message);
+        console.error(`❌ DB Error in row ${index + 2}:`, err.message);
+        errorCount++;
       }
     }
 
+    // ✅ Delete uploaded file
+    const absolutePath = path.resolve(filePath);
+    fs.unlink(absolutePath, (err) => {
+      if (err) console.error("⚠️ Failed to delete uploaded file:", err.message);
+      else console.log("🗑️ Uploaded file deleted:", absolutePath);
+    });
+
+    // ✅ Auto-generate QR codes after successful upload
+    try {
+      const [tokenRows] = await db.execute("SELECT token_id FROM participants");
+      const token_ids = tokenRows.map((r) => r.token_id);
+
+      if (token_ids.length > 0) {
+        await axios.post("http://localhost:4000/generate_qr_batch", {
+          token_ids,
+          error_correction: "M",
+        });
+        console.log("✅ QR batch generated automatically after Excel upload.");
+      }
+    } catch (err) {
+      console.error("⚠️ Failed to auto-generate QR batch:", err.message);
+    }
+
+    // ✅ Final response
     res.json({
-      message: "Excel processed",
+      message: "Excel processed successfully",
       inserted: insertCount,
       errors: errorCount,
     });
-    
-    const absolutePath = path.resolve(filePath);
-
-    fs.unlink(absolutePath, (err) => {
-      if (err) {
-       console.error("⚠️ Failed to delete uploaded file:", err.message);
-       } else {
-        console.log("🗑️ Uploaded file deleted:", absolutePath);
-      }
-});
 
   } catch (error) {
     console.error("❌ Upload error:", error);
@@ -160,23 +153,18 @@ const uploadExcel = async (req, res) => {
   }
 };
 
-// Fetch all participants
+// 🔹 Fetch all participants
 const getParticipants = async (req, res) => {
   try {
-    db.query("SELECT * FROM participants", (err, results) => {
-      if (err) {
-        console.error("❌ DB Fetch Error:", err);
-        return res.status(500).json({ error: "Database error" });
-      }
-      res.json(results);
-    });
+    const [results] = await db.execute("SELECT * FROM participants");
+    res.json(results);
   } catch (error) {
     console.error("❌ getParticipants error:", error);
     res.status(500).json({ error: "Server error" });
   }
 };
 
-// Fetch participants of a particular team
+// 🔹 Fetch participants by team
 const getTeamParticipants = async (req, res) => {
   try {
     const { teamName } = req.params;
@@ -185,24 +173,16 @@ const getTeamParticipants = async (req, res) => {
       return res.status(400).json({ error: "Team name is required" });
     }
 
-    db.query(
+    const [results] = await db.execute(
       "SELECT * FROM participants WHERE LOWER(REPLACE(team_name, ' ', '')) = LOWER(REPLACE(?, ' ', ''))",
-      [teamName],
-      (err, results) => {
-        if (err) {
-          console.error("❌ DB Fetch Error:", err);
-          return res.status(500).json({ error: "Database error" });
-        }
-
-        if (results.length === 0) {
-          return res
-            .status(404)
-            .json({ message: `No participants found for team ${teamName}` });
-        }
-
-        res.json(results);
-      }
+      [teamName]
     );
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: `No participants found for team ${teamName}` });
+    }
+
+    res.json(results);
   } catch (error) {
     console.error("❌ getTeamParticipants error:", error);
     res.status(500).json({ error: "Server error" });
@@ -210,4 +190,3 @@ const getTeamParticipants = async (req, res) => {
 };
 
 module.exports = { uploadExcel, getParticipants, getTeamParticipants };
-

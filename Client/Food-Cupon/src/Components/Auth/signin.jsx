@@ -12,6 +12,8 @@ const SignIn = () => {
     password: "",
   });
 
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState(""); 
   const navigate = useNavigate();
 
 
@@ -46,8 +48,12 @@ const SignIn = () => {
 
 
 
-    alert("Login successful! 🎉");
-    navigate("/home");
+    
+      setMessageType("success");
+      setMessage("✅ Login successful! Redirecting to your home page...");
+
+      // Wait 2 seconds before redirect
+      setTimeout(() => navigate("/home"), 2000);
   } catch (err) {
     alert(`Login failed: ${err.message}`);
   }

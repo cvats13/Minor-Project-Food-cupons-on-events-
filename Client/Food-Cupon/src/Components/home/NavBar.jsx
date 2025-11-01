@@ -12,19 +12,19 @@ export default function Navbar() {
 
       {/* Navigation Links */}
       <div className="hidden md:flex items-center gap-8 text-gray-700 font-medium">
-        <a href="#" className="flex items-center gap-1 hover:text-purple-600 transition">
+        <a href="/home" className="flex items-center gap-1 hover:text-purple-600 transition">
           <Home size={18} /> Home
         </a>
-        <a href="#" className="flex items-center gap-1 hover:text-purple-600 transition">
+        <a href="/import" className="flex items-center gap-1 hover:text-purple-600 transition">
           <Upload size={18} /> Import
         </a>
-        <a href="#" className="flex items-center gap-1 hover:text-purple-600 transition">
+        <a href="/logs" className="flex items-center gap-1 hover:text-purple-600 transition">
           <FileText size={18} /> Logs
         </a>
-        <a href="#" className="flex items-center gap-1 hover:text-purple-600 transition">
+        <a href="/schedule" className="flex items-center gap-1 hover:text-purple-600 transition">
           <Calendar size={18} /> Schedule
         </a>
-        <a href="#" className="flex items-center gap-1 hover:text-purple-600 transition">
+        <a href="/settings" className="flex items-center gap-1 hover:text-purple-600 transition">
           <Settings size={18} /> Settings
         </a>
       </div>

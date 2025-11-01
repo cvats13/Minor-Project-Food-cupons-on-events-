@@ -3,6 +3,8 @@ import Signup from "./Components/Auth/signup";
 import SignIn from "./Components/Auth/signin";
 import Home from "./Components/home/Home";
 import Setting from "./Components/Settings/SettingPage";
+import ImportPage from "./Components/Import/Import_Page";
+import LogsPage from "./Components/logs/logs_page";
 import ProtectedRoute from "./Components/ProtectedRoute";
 
 function App() {
@@ -10,7 +12,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Signup />} />
-        <Route path="/Home" element={<Home />} />
+        <Route path="/signin" element={<SignIn />} />
 
 
         ✅ Protected Home Route
@@ -27,6 +29,24 @@ function App() {
           element={
             <ProtectedRoute>
               <Setting/>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/import"
+          element={
+            <ProtectedRoute>
+              <ImportPage/>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/logs"
+          element={
+            <ProtectedRoute>
+              <LogsPage/>
             </ProtectedRoute>
           }
         />
