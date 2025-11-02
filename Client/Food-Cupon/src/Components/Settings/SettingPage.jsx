@@ -132,19 +132,27 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../home/NavBar";
 import Footer from "../home/Footer";
-import { FaUserCircle, FaPhone, FaEnvelope } from "react-icons/fa";
+import {
+  FaUserCircle,
+  FaPhone,
+  FaEnvelope,
+  FaEdit,
+  FaLock,
+  FaGlobe,
+  FaBell,
+  FaShieldAlt,
+  FaTrash,
+} from "react-icons/fa";
 
 export default function Setting() {
   const navigate = useNavigate();
 
-  // Example user data (replace this with actual user info from backend/localStorage)
   const user = {
     username: "hardik_123",
     name: "Hardik Dhawan",
     phone: "+91 98765 43210",
     email: "hardik@example.com",
-    avatar:
-      "https://cdn-icons-png.flaticon.com/512/3135/3135715.png", // sample avatar
+    avatar: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
   };
 
   const handleBack = () => navigate(-1);
@@ -152,118 +160,171 @@ export default function Setting() {
   const handleLogout = () => {
     const ok = window.confirm("Are you sure you want to logout?");
     if (!ok) return;
-
     localStorage.removeItem("authToken");
     navigate("/login");
   };
 
   return (
-    <div className="flex flex-col min-h-screen font-sans text-gray-800 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
+    <div className="relative flex flex-col min-h-screen font-sans text-gray-800 overflow-hidden">
+      {/* 🌈 Animated Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-pink-200 via-yellow-100 to-blue-200 animate-gradient-xy" />
+
+      {/* 🍕 Floating Food Items */}
+      <FloatingFood
+        src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png" // pizza
+        className="top-10 left-12 w-20 h-20"
+        delay="0s"
+      />
+      <FloatingFood
+        src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" // burger
+        className="top-40 right-16 w-20 h-20"
+        delay="2s"
+      />
+      <FloatingFood
+        src="https://cdn-icons-png.flaticon.com/512/415/415733.png" // donut
+        className="bottom-20 left-1/4 w-16 h-16"
+        delay="4s"
+      />
+      <FloatingFood
+        src="https://cdn-icons-png.flaticon.com/512/1046/1046786.png" // fries
+        className="bottom-32 right-1/4 w-16 h-16"
+        delay="6s"
+      />
+      <FloatingFood
+        src="https://cdn-icons-png.flaticon.com/512/590/590836.png" // coffee
+        className="top-1/2 left-5 w-16 h-16"
+        delay="8s"
+      />
+
       {/* Navbar */}
       <Navbar />
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center text-center px-6 py-10">
-        {/* Title */}
+      <main className="relative flex-1 flex flex-col items-center text-center px-6 py-10 z-10">
+        {/* Header */}
         <div className="flex justify-between items-center w-full max-w-4xl mb-8">
           <button
             onClick={handleBack}
-            className="px-4 py-2 border rounded-lg hover:bg-purple-100 transition text-purple-700 font-semibold"
+            className="px-4 py-2 border-2 border-pink-400 text-pink-700 rounded-lg bg-white/70 hover:bg-pink-100 hover:shadow-lg hover:scale-105 transition-all duration-300 font-semibold"
           >
             ← Back
           </button>
-          <h1 className="text-4xl font-extrabold text-purple-700">
+          <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 drop-shadow-sm animate-pulse">
             Settings ⚙️
           </h1>
-          <div className="w-20" /> {/* Spacer */}
+          <div className="w-20" />
         </div>
 
         {/* Profile Card */}
-        <div className="w-full max-w-3xl bg-white rounded-2xl shadow-md p-8 flex flex-col items-center space-y-4">
+        <div className="w-full max-w-3xl bg-white/70 backdrop-blur-md rounded-3xl shadow-2xl p-8 flex flex-col items-center space-y-4 border border-white/50 transition-all duration-500 hover:shadow-[0_0_50px_rgba(236,72,153,0.3)] hover:scale-[1.01]">
           <div className="relative">
             <img
               src={user.avatar}
               alt="User Avatar"
-              className="w-28 h-28 rounded-full border-4 border-purple-200 shadow-md"
+              className="w-28 h-28 rounded-full border-4 border-white shadow-lg hover:scale-110 transition-transform duration-300"
             />
-            <div className="absolute bottom-1 right-1 bg-purple-500 text-white p-1 rounded-full">
+            <div className="absolute bottom-1 right-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white p-1.5 rounded-full shadow-md animate-bounce">
               <FaUserCircle size={18} />
             </div>
           </div>
 
-          <h2 className="text-2xl font-semibold text-gray-900">{user.name}</h2>
-          <p className="text-gray-500">@{user.username}</p>
+          <h2 className="text-2xl font-bold text-gray-900">{user.name}</h2>
+          <p className="text-gray-600 font-medium">@{user.username}</p>
 
           <div className="mt-4 w-full text-center space-y-2">
-            <div className="flex justify-center items-center space-x-2">
-              <FaPhone className="text-purple-500" />
-              <span>{user.phone}</span>
+            <div className="flex justify-center items-center space-x-2 text-pink-600">
+              <FaPhone />
+              <span className="font-medium">{user.phone}</span>
             </div>
-            <div className="flex justify-center items-center space-x-2">
-              <FaEnvelope className="text-purple-500" />
-              <span>{user.email}</span>
+            <div className="flex justify-center items-center space-x-2 text-purple-600">
+              <FaEnvelope />
+              <span className="font-medium">{user.email}</span>
             </div>
           </div>
 
           <button
             onClick={handleLogout}
-            className="mt-6 px-6 py-2 border border-red-600 text-red-600 rounded-full hover:bg-red-50 transition duration-200"
+            className="mt-6 px-8 py-2 bg-gradient-to-r from-red-500 via-pink-500 to-orange-500 text-white rounded-full shadow-lg hover:opacity-90 hover:scale-110 transition-transform duration-300 font-semibold"
           >
             Logout
           </button>
         </div>
 
-        {/* Account Options */}
-        <div className="w-full max-w-3xl bg-white rounded-2xl shadow-md p-8 mt-10 text-left">
-          <h2 className="text-2xl font-semibold text-purple-700 mb-4">
-            Account Settings
+        {/* Account Settings */}
+        <div className="w-full max-w-3xl bg-white/80 backdrop-blur-md rounded-3xl shadow-lg p-8 mt-10 text-left border border-pink-200 hover:shadow-[0_0_40px_rgba(236,72,153,0.3)] transition-all duration-500">
+          <h2 className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 mb-4 flex items-center gap-2">
+            <FaUserCircle /> Account Settings
           </h2>
 
           <div className="grid gap-3">
-            <button className="text-left w-full px-4 py-3 border rounded-lg hover:bg-purple-50 transition">
-              Edit Profile
-            </button>
-            <button className="text-left w-full px-4 py-3 border rounded-lg hover:bg-purple-50 transition">
-              Change Password
-            </button>
-            <button className="text-left w-full px-4 py-3 border rounded-lg hover:bg-purple-50 transition">
-              Login &amp; Security
-            </button>
+            <AnimatedButton icon={<FaEdit />} color="pink" text="Edit Profile" />
+            <AnimatedButton icon={<FaLock />} color="purple" text="Change Password" />
+            <AnimatedButton icon={<FaShieldAlt />} color="blue" text="Login & Security" />
           </div>
 
           <hr className="my-6 border-gray-200" />
 
-          <h2 className="text-2xl font-semibold text-purple-700 mb-4">
-            Preferences
+          <h2 className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-orange-500 to-pink-500 mb-4 flex items-center gap-2">
+            <FaGlobe /> Preferences
           </h2>
+
           <div className="grid gap-3">
-            <button className="text-left w-full px-4 py-3 border rounded-lg hover:bg-purple-50 transition">
-              Language
-            </button>
-            <button className="text-left w-full px-4 py-3 border rounded-lg hover:bg-purple-50 transition">
-              Notification Settings
-            </button>
+            <AnimatedButton icon={<FaGlobe />} color="yellow" text="Language" />
+            <AnimatedButton icon={<FaBell />} color="orange" text="Notification Settings" />
           </div>
 
           <hr className="my-6 border-gray-200" />
 
-          <h2 className="text-2xl font-semibold text-purple-700 mb-4">
-            Privacy & Danger Zone
+          <h2 className="text-2xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-pink-500 to-purple-500 mb-4 flex items-center gap-2">
+            <FaShieldAlt /> Privacy & Danger Zone
           </h2>
+
           <div className="grid gap-3">
-            <button className="text-left w-full px-4 py-3 border rounded-lg hover:bg-purple-50 transition">
-              Privacy Settings
-            </button>
-            <button className="text-left w-full px-4 py-3 border border-red-600 text-red-600 rounded-lg hover:bg-red-50 transition">
-              Delete Account
+            <AnimatedButton icon={<FaShieldAlt />} color="purple" text="Privacy Settings" />
+            <button className="flex items-center gap-3 text-left w-full px-4 py-3 border-2 border-red-500 text-red-600 rounded-lg hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 hover:scale-[1.05] transition-all duration-300 font-semibold">
+              <FaTrash className="text-red-500" /> Delete Account
             </button>
           </div>
         </div>
       </main>
 
-      {/* Footer */}
       <Footer />
     </div>
   );
 }
+
+/* ✨ Reusable colorful animated button */
+function AnimatedButton({ icon, color, text }) {
+  const colorMap = {
+    pink: "from-pink-50 to-purple-50 border-pink-300 text-pink-700",
+    purple: "from-purple-50 to-blue-50 border-purple-300 text-purple-700",
+    blue: "from-blue-50 to-cyan-50 border-blue-300 text-blue-700",
+    yellow: "from-yellow-50 to-orange-50 border-yellow-300 text-yellow-700",
+    orange: "from-orange-50 to-pink-50 border-orange-300 text-orange-700",
+  };
+
+  return (
+    <button
+      className={`flex items-center gap-3 text-left w-full px-4 py-3 border-2 rounded-lg bg-gradient-to-r hover:scale-[1.03] hover:shadow-md transition-all duration-300 font-medium ${colorMap[color]}`}
+    >
+      {icon}
+      {text}
+    </button>
+  );
+}
+
+/* 🍩 Floating Food Component */
+function FloatingFood({ src, className, delay }) {
+  return (
+    <img
+      src={src}
+      alt="food item"
+      className={`absolute opacity-40 hover:opacity-70 transform transition-transform duration-1000 ${className} animate-float`}
+      style={{ animationDelay: delay }}
+    />
+  );
+}
+
+
+
 

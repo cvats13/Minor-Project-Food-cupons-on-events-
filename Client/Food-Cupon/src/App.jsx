@@ -27,9 +27,9 @@ function App() {
         <Route
           path="/settings"
           element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Setting/>
-            </ProtectedRoute>
+            // </ProtectedRoute>
           }
         />
 
