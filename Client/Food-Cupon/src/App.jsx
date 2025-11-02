@@ -4,7 +4,7 @@ import SignIn from "./Components/Auth/signin";
 import Home from "./Components/home/Home";
 import Setting from "./Components/Settings/SettingPage";
 import ImportPage from "./Components/Import/Import_Page";
-import LogsPage from "./Components/logs/logs_page";
+import LogsPage from "./Components/Logs/logspage";
 import ProtectedRoute from "./Components/ProtectedRoute";
 
 function App() {
