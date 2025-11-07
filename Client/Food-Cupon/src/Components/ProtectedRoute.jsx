@@ -1,3 +1,4 @@
+// src/components/ProtectedRoute.jsx
 import { Navigate } from "react-router-dom";
 import { getToken, decodeToken } from "../utils/auth";
 
@@ -9,18 +10,19 @@ const ProtectedRoute = ({ children }) => {
   }
 
   try {
-    const decoded = decodeToken();
+    const decoded = decodeToken(token);
     const currentTime = Date.now() / 1000;
 
-    // If token expired
-    if (decoded.exp && decoded.exp < currentTime) {
+    // If token is expired
+    if (decoded?.exp && decoded.exp < currentTime) {
       localStorage.removeItem("token");
       return <Navigate to="/signin" replace />;
     }
 
-    return children; // ✅ token valid
+    return children; // ✅ Valid token → show the protected page
   } catch (error) {
-    console.error("Invalid token:", error);
+    console.error("❌ Invalid token:", error);
+    localStorage.removeItem("token");
     return <Navigate to="/signin" replace />;
   }
 };

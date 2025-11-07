@@ -164,6 +164,7 @@ export default function Home() {
           <>
             <div className="max-w-3xl">
               <h1 className="text-4xl sm:text-5xl font-extrabold text-purple-700 mb-4">
+                
                 College Hackathon Food Coupon System 🍽️
               </h1>
               <p className="text-gray-700 text-lg mb-8">
